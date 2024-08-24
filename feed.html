@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@3.0.0/dist/controls.css">
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@3.0.0/dist/shaka-player.compiled.js"></script>
+</head>
+<body>
+    <video id="video" controls width="640" height="360"></video>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var video = document.getElementById('video');
+            var player = new shaka.Player(video);
+
+            // Initialize the player.
+            player.load('https://wycutters.wyscout.com/box/stadium-efl-one/g5594717v4/g5594717v4.m3u8').then(function() {
+                console.log('The video has been loaded!');
+            }).catch(function(e) {
+                console.error('Error loading video', e);
+            });
+
+            // Add a button to select quality
+            var qualitySelector = document.createElement('select');
+            document.body.appendChild(qualitySelector);
+
+            player.addEventListener('adaptation', function() {
+                var tracks = player.getVariantTracks();
+                qualitySelector.innerHTML = '';
+                tracks.forEach(function(track, index) {
+                    var option = document.createElement('option');
+                    option.value = index;
+                    option.text = track.height + 'p';
+                    qualitySelector.appendChild(option);
+                });
+
+                qualitySelector.addEventListener('change', function() {
+                    player.selectVariantTrack(tracks[this.value]);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
